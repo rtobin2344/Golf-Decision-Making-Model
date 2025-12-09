@@ -1,0 +1,63 @@
+Checkpoint 4
+Data 6560 Sport Analytics
+Ryan Tobin
+11/24/25
+Risk vs. Reward: Analyzing Aggressive vs. Conservative Decision-Making in Golf
+Selected Dataset & Access
+Dataset: OpenDataBay “Golf Tournament Results & Player Stats (2015–2022)” — 2022 subset used for initial work. This file contains tournament level scoring, strokes gained categories (SG: OTT, APP, ARG, PUTT, T2G, total), round and hole scoring, tournament metadata (player ID, tournament ID/name, course, date, season), and traditional performance statistics (driving distance/accuracy, proximity, GIR, scrambling, etc.).
+
+My GitHub repository which includes this dataset is: https://github.com/rtobin2344/Golf-Decision-Making-Model
+
+This dataset is suitable for my project because it includes the key variables needed to evaluate aggressiveness vs performance outcomes (SG categories, scoring, course & player context). However, this is not full shot by shot data. DataGolf required a $270 annual deposit to access their full PGA tour Shotlink data access. My current monthly subscription gives access to some data that I will use, but I’ve had to work around analyzing shot by shot stats specifically. The variables I have will be sufficient for a meaningful analysis.
+
+Data Structure & Target Grain
+Target grain: each row represents a player and tournament round, enabling modeling of performance per tournament
+
+Key variables:
+Strokes gained (SG) components: sg_ott, sg_app, sg_arg, sg_putt, sg_t2g, sg_total
+Round/hole outcome: strokes, hole_par, score_to_par
+Course/Tournament outcome: tournament_id, course, date, season
+Player data: player_id, player (name)
+
+This structure allows player to player comparisons like who gains the most SG, and within player comparisons across tournaments
+
+Preprocessing & Cleaning
+	Unnecessary columns were removed including things related to betting game scoring (hole_DKP, hole_FDP, hole_SDP), fantasy score streaks, placeholder columns, and irrelevant data. This simplifies the analysis in the future
+	Data types are normalized and missing data will be addressed. Data columns were converted to standard format, numeric fields were converted to integers, placeholder NA’s were put in for blank values, rows missing sg_total were marked out, and duplicates were checked for and removed.
+
+Key Variables Derived:
+
+Derived Variable
+Definition
+Ball striking aggressiveness (bs_aggr)
+Sg_ott + sg_app
+Approach vs putt split (aggr_split)
+abs(sg_app - sg_putt)
+Score to par (score_par_diff)
+Strokes - (sum of hole_pars)
+Under par frequency (upar_freq)
+% rounds under par
+
+Variable bs_aggr measures how much a player gains from driving or approach shots (acting as a proxy for aggressive shot making)
+Aggr_split acts as a risk/reward indicator, high values suggest aggressive approach heavy play (at cost of putting?)
+Score_par_diff is an outcome variable for performance analysis
+Upar_freq is the percentage of holes played under par, higher birdie rate may indicate effective aggression
+These derived variables will allow comparing aggressive vs conservative players/tournaments quantitatively, even without raw shot-by-shot data.
+Modeling & Analytical Plan
+Exploratory data analysis: examine distributions of SG components, aggressiveness proxies, and scores to par. Will generate scatterplots and correlation matrices if applicable
+Regression modeling: regress score_to_par or finishing position on aggressiveness proxies (bs_aggr, aggr_split), controlling for course + tournament fixed effects
+Stratified analysis: compare results for different style courses, course difficulties, or course locations to assess when aggression yields a payoff
+Validation: drop outlier tournaments, compare top players vs average players, and test sensitivity to missing data
+Repository Organization
+	I have created the GitHub repository and uploaded the raw data, as linked at the beginning of this checkpoint. File structure plan:
+/data/raw/                     — raw data (untouched CSV)  
+/data/processed/               — cleaned and feature-engineered data  
+/notebooks/                    — analysis scripts / Jupyter notebooks  
+/reports/                      — checkpoint memos, outputs  
+README.md                      — overview & documentation  
+requirements.txt               — dependencies (pandas, numpy, sklearn, etc.)  
+Next Steps
+	Build preprocessing script, save cleaned data on GitHub, begin more exploratory data analysis, and draft first modeling pipeline
+
+Conclusion
+	Although I do not have shot by shot data via shotlink/DataGolf exactly like I hoped for, the OpenDataBay dataset provides sufficient round and tournament detail including strokes gained components that will allow meaningful examination of the trade off between aggressiveness and performance in golf. The data is enough to test whether this aggressive play yields higher payoff, and under which conditions.
